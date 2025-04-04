@@ -1,6 +1,4 @@
 from backend.app.back_utils import test
-
-# Example in your backend utils.py or services.py
 import requests
 import os
 import json
@@ -150,4 +148,6 @@ def get_rag_answer(
 
 
 def test_service():
-    return test()
+    data = get_rag_answer(
+        query="Que faire en cas de brulure ?", collection_name="Test")
+    return data
