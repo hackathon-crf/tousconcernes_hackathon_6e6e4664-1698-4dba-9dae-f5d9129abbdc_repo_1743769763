@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services import test_service
 from settings.config import settings
 
-
 app_router = APIRouter(
     prefix="/api/app",
     tags=["Retrieval QA"],
