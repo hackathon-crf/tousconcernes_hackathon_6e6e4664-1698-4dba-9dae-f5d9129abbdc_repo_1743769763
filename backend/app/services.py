@@ -19,6 +19,7 @@ def _call_rag_api(method: str, endpoint: str, params: dict = None, data: dict = 
     url = f"{RAG_API_BASE_URL}{endpoint}"
     headers = {"Accept": "application/json"}  # Common header
 
+    print(params)
     try:
         if method.upper() == 'GET':
             response = requests.get(url, params=params, headers=headers)
@@ -92,7 +93,7 @@ def add_document_to_collection(collection_name: str, document_path: str, embeddi
 
 def get_rag_answer(
     query: str,
-    collection_name: str,
+    collection_name: str,  # list of str as str
     llm_model_name: str = "mistral-small-latest",  # Or other suitable model
     prompt_template: str = "Use the following context to answer the question concisely.\nContext:\n{context}\n\nQuestion: {query}\n\nAnswer:",
     history: list = None  # Expecting a list of chat messages, will be JSON serialized
@@ -124,6 +125,14 @@ def get_rag_answer(
     # You might need to inspect the exact structure of 'result' (e.g., result['answer'])
     return result
 
+
+def get_rag_collections():
+    result = _call_rag_api(
+        method='GET',
+        endpoint='/api/app/collection/list'
+    )
+    return result
+
 # --- Example Usage (within a FastAPI route/service function) ---
 # async def handle_user_query(user_input: str, team_collection: str):
 #     try:
@@ -148,6 +157,8 @@ def get_rag_answer(
 
 
 def test_service():
+    collections = get_rag_collections()
     data = get_rag_answer(
-        query="Que faire en cas de brulure ?", collection_name="Test")
+        query="Que faire en cas de crues ?", collection_name=str(collections))
+
     return data
