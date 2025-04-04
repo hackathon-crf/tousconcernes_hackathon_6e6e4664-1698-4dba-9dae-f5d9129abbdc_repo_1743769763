@@ -11,10 +11,12 @@ DOMAIN_NAME = os.getenv("DOMAIN_NAME", "localhost")
 ROOT_PATH = os.getenv("ROOT_PATH", "")
 BACKEND_PORT = os.getenv("BACKEND_PORT", "8090")
 
+
 def call_backend_test():
     try:
         # Construct URL with proper protocol and format
-        url = f"https://{DOMAIN_NAME}{ROOT_PATH}/api/app/test/"
+        # url = f"https://{DOMAIN_NAME}:{BACKEND_PORT}/api/app/test/"
+        url = f"http://{DOMAIN_NAME}:{BACKEND_PORT}/api/app/test/"
         print(f"Calling backend URL: {url}")
 
         params = {}
