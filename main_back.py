@@ -22,9 +22,12 @@ ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 app = create_app(root_path=ROOT_PATH)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Run FastAPI server with custom port")
-    parser.add_argument("--port", type=int, default=8090, help="Port number to run the server on")
-    parser.add_argument("--root_path", type=str, default="", help="The root path where the API is mounted (e.g., /username/app_name)")
+    parser = argparse.ArgumentParser(
+        description="Run FastAPI server with custom port")
+    parser.add_argument("--port", type=int, default=8090,
+                        help="Port number to run the server on")
+    parser.add_argument("--root_path", type=str, default="",
+                        help="The root path where the API is mounted (e.g., /username/app_name)")
     args = parser.parse_args()
 
     # Update root path from arguments
@@ -46,5 +49,5 @@ if __name__ == '__main__':
         root_path=args.root_path,
         reload=True,
         log_level="debug",
-        #openapi_url=f"{args.root_path}/openapi.json" if args.root_path else "/openapi.json"
+        # openapi_url=f"{args.root_path}/openapi.json" if args.root_path else "/openapi.json"
     )
