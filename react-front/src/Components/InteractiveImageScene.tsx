@@ -4,180 +4,215 @@ import {
   Typography,
   Card,
   CardContent,
-  CardMedia,
+  TextField,
   Paper,
-  Modal,
   Grid,
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-interface InfoCard {
+interface AnswerChoice {
   id: number;
-  title: string;
-  description: string;
-  image?: string;
+  text: string;
+  isTextField?: boolean;
+}
+
+interface Question {
+  id: number;
+  text: string;
+  choices: AnswerChoice[];
 }
 
 const InteractiveImageScene: React.FC = () => {
-  const [selectedPoint, setSelectedPoint] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [answers, setAnswers] = useState<{ [questionId: number]: string }>({});
+  const [customAnswer, setCustomAnswer] = useState<string>("");
 
-  // Mock data for interactive points on the image
-  const interactivePoints = [
-    { id: 1, x: 20, y: 30, title: "Emergency Kit" },
-    { id: 2, x: 50, y: 60, title: "Safe Zone" },
-    { id: 3, x: 70, y: 25, title: "Evacuation Route" },
-    { id: 4, x: 30, y: 70, title: "Communication Plan" },
-  ];
-
-  const infoCards: InfoCard[] = [
+  // Mock data for questions
+  const questions: Question[] = [
     {
       id: 1,
-      title: "Emergency Kit",
-      description:
-        "Prepare a kit with essentials: water, food, first aid supplies, medications, flashlight, and important documents.",
-      image: "https://via.placeholder.com/150/FF5733/FFFFFF?text=Emergency+Kit",
+      text: "What should you include in your emergency kit?",
+      choices: [
+        { id: 1, text: "Only non-perishable food" },
+        { id: 2, text: "Only water and first aid supplies" },
+        {
+          id: 3,
+          text: "Water, food, first aid supplies, flashlight, and important documents",
+        },
+        { id: 4, text: "", isTextField: true },
+      ],
     },
     {
       id: 2,
-      title: "Safe Zone",
-      description:
-        "Identify areas in your home that are safest during different types of disasters.",
-      image: "https://via.placeholder.com/150/33FF57/FFFFFF?text=Safe+Zone",
+      text: "What is the recommended amount of water to store per person per day?",
+      choices: [
+        { id: 1, text: "1 liter" },
+        { id: 2, text: "2 liters" },
+        { id: 3, text: "4 liters" },
+        { id: 4, text: "", isTextField: true },
+      ],
     },
     {
       id: 3,
-      title: "Evacuation Route",
-      description:
-        "Plan multiple evacuation routes from your home and neighborhood.",
-      image: "https://via.placeholder.com/150/3357FF/FFFFFF?text=Evacuation",
-    },
-    {
-      id: 4,
-      title: "Communication Plan",
-      description:
-        "Create a plan for how family members will contact each other during an emergency.",
-      image: "https://via.placeholder.com/150/FF33A8/FFFFFF?text=Communication",
+      text: "Where is the safest place during an earthquake?",
+      choices: [
+        { id: 1, text: "Under a sturdy table" },
+        { id: 2, text: "Near windows" },
+        { id: 3, text: "Outside the building if possible" },
+        { id: 4, text: "", isTextField: true },
+      ],
     },
   ];
 
-  const handlePointClick = (id: number) => {
-    setSelectedPoint(id);
+  const currentQuestion = questions[currentQuestionIndex];
+
+  const handleAnswerSelect = (questionId: number, answerText: string) => {
+    setAnswers({
+      ...answers,
+      [questionId]: answerText,
+    });
+
+    // Move to next question if not at the end
+    if (currentQuestionIndex < questions.length - 1) {
+      setTimeout(() => {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setCustomAnswer("");
+      }, 500);
+    }
   };
 
-  const handleCloseModal = () => {
-    setSelectedPoint(null);
+  const handleCustomAnswerSubmit = () => {
+    if (customAnswer.trim()) {
+      handleAnswerSelect(currentQuestion.id, customAnswer);
+    }
   };
 
-  const selectedCard = infoCards.find((card) => card.id === selectedPoint);
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleFinish = () => {
+    // Navigate to a results page with the answers as state
+    navigate("/results", { state: { answers } });
+  };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-      <Typography variant="h5" gutterBottom align="center">
-        Disaster Preparation Guide
-      </Typography>
-
-      <Box sx={{ position: "relative", my: 4 }}>
-        {/* Background image */}
-        <Box
-          component="img"
-          src="https://via.placeholder.com/800x500/EEEEEE/AAAAAA?text=Home+Safety+Diagram"
-          alt="Interactive Home Safety Diagram"
-          sx={{ width: "100%", borderRadius: 2 }}
-        />
-
-        {/* Interactive points */}
-        {interactivePoints.map((point) => (
-          <Box
-            key={point.id}
-            sx={{
-              position: "absolute",
-              left: `${point.x}%`,
-              top: `${point.y}%`,
-              width: 20,
-              height: 20,
-              borderRadius: "50%",
-              bgcolor: "primary.main",
-              cursor: "pointer",
-              transform: "translate(-50%, -50%)",
-              transition: "all 0.2s",
-              "&:hover": {
-                width: 24,
-                height: 24,
-                boxShadow: 3,
-              },
-            }}
-            onClick={() => handlePointClick(point.id)}
-          />
+    <Paper
+      elevation={3}
+      sx={{ p: 3, borderRadius: 2, maxWidth: 800, mx: "auto" }}
+    >
+      {/* Question Stepper/Timeline */}
+      <Stepper
+        activeStep={currentQuestionIndex}
+        alternativeLabel
+        sx={{ mb: 4 }}
+      >
+        {questions.map((question, index) => (
+          <Step key={question.id}>
+            <StepLabel>Question {index + 1}</StepLabel>
+          </Step>
         ))}
+      </Stepper>
+
+      {/* Current Question */}
+      <Box sx={{ mb: 4, textAlign: "center" }}>
+        <Typography variant="h5" gutterBottom>
+          {currentQuestion.text}
+        </Typography>
       </Box>
 
-      <Typography variant="h6" gutterBottom>
-        Preparation Cards
-      </Typography>
-
-      <Grid container spacing={2}>
-        {infoCards.map((card) => (
-          <Grid key={card.id}>
-            <Card
-              sx={{
-                cursor: "pointer",
-                transition: "transform 0.2s",
-                "&:hover": { transform: "scale(1.03)" },
-              }}
-              onClick={() => handlePointClick(card.id)}
-            >
-              <CardMedia
-                component="img"
-                height="140"
-                image={card.image}
-                alt={card.title}
-              />
-              <CardContent>
-                <Typography variant="subtitle1">{card.title}</Typography>
-              </CardContent>
-            </Card>
+      {/* Answer Choices */}
+      <Grid container spacing={2} justifyContent="center">
+        {currentQuestion.choices.map((choice) => (
+          <Grid key={choice.id}>
+            {choice.isTextField ? (
+              <Card
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  p: 2,
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Your own answer:
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    variant="outlined"
+                    placeholder="Type your answer here..."
+                    value={customAnswer}
+                    onChange={(e) => setCustomAnswer(e.target.value)}
+                  />
+                </CardContent>
+                <Box sx={{ p: 2, pt: 0 }}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleCustomAnswerSubmit}
+                    disabled={!customAnswer.trim()}
+                  >
+                    Submit
+                  </Button>
+                </Box>
+              </Card>
+            ) : (
+              <Card
+                sx={{
+                  height: "100%",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  "&:hover": { transform: "scale(1.02)", boxShadow: 3 },
+                  bgcolor:
+                    answers[currentQuestion.id] === choice.text
+                      ? "primary.light"
+                      : "background.paper",
+                }}
+                onClick={() =>
+                  handleAnswerSelect(currentQuestion.id, choice.text)
+                }
+              >
+                <CardContent>
+                  <Typography variant="body1" align="center" sx={{ p: 2 }}>
+                    {choice.text}
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
         ))}
       </Grid>
 
-      {/* Modal for displaying card details */}
-      <Modal
-        open={selectedPoint !== null}
-        onClose={handleCloseModal}
-        aria-labelledby="card-details-modal"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", sm: 400 },
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
+      {/* Navigation */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+        <Button
+          variant="outlined"
+          onClick={goToPreviousQuestion}
+          disabled={currentQuestionIndex === 0}
         >
-          {selectedCard && (
-            <>
-              <Typography variant="h6" component="h2" gutterBottom>
-                {selectedCard.title}
-              </Typography>
-              {selectedCard.image && (
-                <Box
-                  component="img"
-                  src={selectedCard.image}
-                  alt={selectedCard.title}
-                  sx={{ width: "100%", borderRadius: 1, mb: 2 }}
-                />
-              )}
-              <Typography variant="body1">
-                {selectedCard.description}
-              </Typography>
-            </>
-          )}
-        </Box>
-      </Modal>
+          Previous
+        </Button>
+
+        <Typography variant="body2" sx={{ alignSelf: "center" }}>
+          Question {currentQuestionIndex + 1} of {questions.length}
+        </Typography>
+
+        {currentQuestionIndex === questions.length - 1 && (
+          <Button variant="contained" color="success" onClick={handleFinish}>
+            Finish
+          </Button>
+        )}
+      </Box>
     </Paper>
   );
 };

@@ -194,16 +194,6 @@ const MapScene: React.FC<MapSceneProps> = ({
           gap: 2,
         }}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={getCurrentLocation}
-          disabled={loading}
-          sx={{ mb: 2 }}
-        >
-          {loading ? "Evaluation..." : "Evalue mes risques"}
-        </Button>
-
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error}</Alert>}
 
@@ -238,6 +228,16 @@ const MapScene: React.FC<MapSceneProps> = ({
             </Box>
           )}
         </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={getCurrentLocation}
+          disabled={loading}
+          sx={{ mb: 2 }}
+        >
+          {loading ? "Evaluation..." : "Evalue mes risques"}
+        </Button>
       </Box>
     </Paper>
   );

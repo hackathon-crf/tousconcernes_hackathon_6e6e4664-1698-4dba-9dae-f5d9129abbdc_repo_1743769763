@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MapScene from "./Components/MapScene";
 import RiskAssessmentScene from "./Components/RiskAssessmentScene";
 import InteractiveImageScene from "./Components/InteractiveImageScene";
+import ResultsScene from "./Components/ResultsScene";
 
 // Create a theme
 const theme = createTheme({
@@ -64,6 +65,7 @@ const App: React.FC = () => {
               path="/interactive-guide"
               element={<InteractiveImageScene />}
             />
+            <Route path="/results" element={<ResultsScene />} />
           </Routes>
         </Container>
       </Router>

@@ -66,7 +66,7 @@ const RiskAssessmentScene: React.FC<RiskAssessmentSceneProps> = ({
 
       <Grid container spacing={2}>
         {Object.entries(riskData).map(([key, value]) => (
-          <Grid item xs={6} sm={4} key={key}>
+          <Grid key={key}>
             <Box
               sx={{
                 p: 2,
