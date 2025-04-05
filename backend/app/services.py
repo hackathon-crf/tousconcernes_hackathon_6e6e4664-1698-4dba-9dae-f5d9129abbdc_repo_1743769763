@@ -8,6 +8,7 @@ load_dotenv()  # Load environment variables if using a .env file
 
 # Replace default if needed
 RAG_API_BASE_URL = os.getenv("RAG_API_BASE_URL", "YOUR_RAG_API_BASE_URL")
+CHATBOT_API_BASE_URL = os.getenv("CHATBOT_API_BASE_URL", "YOUR_CHATBOT_API_BASE_URL")
 # Replace default if needed
 API_KEY = os.getenv("MISTRAL_API_KEY", "YOUR_API_KEY")
 
@@ -162,3 +163,37 @@ def test_service():
         query="Que faire en cas de crues ?", collection_name=str(collections))
 
     return data
+
+def get_mistral_answer(
+    query: str,
+    collection_name: str,  # list of str as str
+    llm_model_name: str = "mistral-small-latest",  # Or other suitable model
+    history: list = None  # Expecting a list of chat messages, will be JSON serialized
+):
+	retrieval_system_prompt = ""
+
+	# Format collection name as a JSON array string
+	collection_list = json.dumps([collection_name])
+
+
+	# Use Mistral model
+	retrieval_params = {
+		"query": query,
+		"model_family": "mistral",
+		"model_name": "mistral-small-latest",
+		"api_key": API_KEY,
+		"prompt": retrieval_system_prompt,
+		"collection_name": collection_list,
+		"history_data": json.dumps([])
+	}
+
+	endpoint = '/api/app/back_app/'
+	url = f"{CHATBOT_API_BASE_URL}{endpoint}"
+	retrieval_response = requests.get(url, params=retrieval_params)
+
+	print(retrieval_response)
+
+	if retrieval_response.status_code != 200:
+		print(retrieval_response)
+		return None
+	return retrieval_response.text
