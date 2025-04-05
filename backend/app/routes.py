@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.services import test_service
+from backend.app.services import test_service, get_rag_answer
 from settings.config import settings
 
 app_router = APIRouter(
@@ -67,4 +67,36 @@ async def test():
         }
     }
 
-    # Registering routes
+@app_router.post("/timeline/create/")
+async def create_timeline():
+	collections = ["timeline_create"]
+	try:
+		return {
+			"status:": 201,
+			"message": "OK",
+			"data": get_rag_answer(
+				query="Creer une timeline.", collection_name=str(collections)
+			)
+		}
+	except Exception as e:
+		return {
+			"status:": 500,
+			"message": f"{str(e)}",
+		}
+
+@app_router.get("/timeline/analyze/")
+async def analyze_timeline(timeline: str):
+	collections = ["timeline_analyze"]
+	try:
+		return {
+			"status:": 200,
+			"message": "OK",
+			"data": get_rag_answer(
+				query="Analyze cette timeline.", collection_name=str(collections)
+			)
+		}
+	except Exception as e:
+		return {
+			"status:": 500,
+			"message": f"{str(e)}",
+		}
