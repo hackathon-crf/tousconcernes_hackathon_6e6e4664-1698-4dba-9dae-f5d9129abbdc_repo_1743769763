@@ -1,0 +1,3 @@
+[submodule "reactvite"]
+	path = reactvite
+	url = git@github.com:Tablerase/HackathonCroixRouge.git

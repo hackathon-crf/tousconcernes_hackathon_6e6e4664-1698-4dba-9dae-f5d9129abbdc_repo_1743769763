@@ -3,8 +3,10 @@ from typing import List
 
 
 class Settings(BaseSettings):
+    # ! Change allowed host when cors pb solved
     ALLOWED_HOSTS: List[str] = [
         "http://localhost",
+        "*",
         "https://hackathon-croix-rouge.vercel.app",
     ]
     PROJECT_NAME: str = "Default ForgeAI Application"
