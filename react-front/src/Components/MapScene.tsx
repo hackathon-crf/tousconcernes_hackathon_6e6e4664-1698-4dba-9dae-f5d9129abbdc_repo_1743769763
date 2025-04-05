@@ -168,11 +168,11 @@ const MapScene: React.FC<MapSceneProps> = ({
 
       // Mock data for demonstration
       const mockData = {
-        flood: 75,
+        flood: 80,
         earthquake: 25,
-        fire: 50,
+        fire: 10,
         storm: 60,
-        landslide: 30,
+        landslide: 5,
       };
       setRiskData(mockData);
       setLoading(false);

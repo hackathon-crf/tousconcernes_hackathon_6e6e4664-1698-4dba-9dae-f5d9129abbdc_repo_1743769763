@@ -67,6 +67,26 @@ const InteractiveImageScene: React.FC = () => {
         { id: 4, text: "", isTextField: true },
       ],
     },
+    {
+      id: 4,
+      text: "What should you do if you are trapped under debris?",
+      choices: [
+        { id: 1, text: "Stay quiet and wait for help" },
+        { id: 2, text: "Try to move as much as possible" },
+        { id: 3, text: "Make noise to attract attention" },
+        { id: 4, text: "", isTextField: true },
+      ],
+    },
+    {
+      id: 5,
+      text: "What is the best way to stay informed during a disaster?",
+      choices: [
+        { id: 1, text: "Social media" },
+        { id: 2, text: "Local news channels" },
+        { id: 3, text: "Emergency alert systems" },
+        { id: 4, text: "", isTextField: true },
+      ],
+    },
   ];
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -99,8 +119,13 @@ const InteractiveImageScene: React.FC = () => {
   };
 
   const handleFinish = () => {
-    // Navigate to a results page with the answers as state
-    navigate("/results", { state: { answers } });
+    // Navigate to a results page with both answers and questions in the state
+    navigate("/results", {
+      state: {
+        answers,
+        questions: questions.map((q) => ({ id: q.id, text: q.text })), // Only send necessary data
+      },
+    });
   };
 
   return (

@@ -13,10 +13,13 @@ import {
 const ResultsScene: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { answers } = location.state || { answers: {} };
+  const { answers, questions = [] } = location.state || {
+    answers: {},
+    questions: [],
+  };
 
-  // Reference to the questions - you might want to move this to a shared location
-  const questions = [
+  // Fallback questions if none were passed (for backward compatibility)
+  const fallbackQuestions = [
     {
       id: 1,
       text: "What should you include in your emergency kit?",
@@ -31,6 +34,9 @@ const ResultsScene: React.FC = () => {
     },
   ];
 
+  // Use passed questions or fallback if none were passed
+  const displayQuestions = questions.length > 0 ? questions : fallbackQuestions;
+
   return (
     <Paper
       elevation={3}
@@ -41,7 +47,7 @@ const ResultsScene: React.FC = () => {
       </Typography>
 
       <List sx={{ mb: 4 }}>
-        {questions.map((question) => (
+        {displayQuestions.map((question) => (
           <ListItem key={question.id} divider>
             <ListItemText
               primary={question.text}

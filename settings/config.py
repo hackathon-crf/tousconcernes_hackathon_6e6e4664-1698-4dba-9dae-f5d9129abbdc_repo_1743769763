@@ -5,6 +5,7 @@ from typing import List
 class Settings(BaseSettings):
     ALLOWED_HOSTS: List[str] = [
         "http://localhost",
+        "https://hackathon-croix-rouge.vercel.app/",
     ]
     PROJECT_NAME: str = "Default ForgeAI Application"
     API_VERSION_STR: str = "/api/v1"
