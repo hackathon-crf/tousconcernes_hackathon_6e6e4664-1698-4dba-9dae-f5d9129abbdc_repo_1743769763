@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services import test_service, get_rag_answer, get_mistral_answer
 from settings.config import settings
@@ -68,6 +68,11 @@ async def test():
     }
 
 def get_query_create() -> str:
+    """
+    Prompt engineering to get a JSON timeline
+    TODO: test w/ users, evaluate how pertinent is the scenario
+    TODO: branching scenario
+    """
     return """
 Tu es une IA conversationnelle qui a pour but de sensibiliser le grand public à la préparation et à la sensibilisations aux bons comportement en temps de crise. Ton rôle est didentifier la situation à partir dune description, de poser les bonnes questions à l'utilisateur, et de fournir les conseils et recommandations adaptés en respectant les consignes officielles.
 Génére une timeline linéaire (non ramifiée) composée de 4 sessions, chacune incluant un événement, une liste d'actions possibles, une action choisie et la situation qui en découle. Le scénario est basé sur des crises de type inondations.
@@ -130,7 +135,15 @@ Contraintes :
 
 @app_router.post("/timeline/create/")
 async def create_timeline():
-    "http://localhost:8090/api/app/timeline/create/"
+    """ POST route to generate a scenario, return a JSON
+    is used to get the user something to play with
+    current: UNUSED, body is plain text, RAG collection is a constant
+    example url: http://localhost:8090/api/app/timeline/create/
+    TODO: body is json, includes info on selected RAG knowledge base + info for prompt engineering
+    TODO: use cached embedding/answers
+    TODO: stream answer to lower user waiting time
+    """
+    
     collections = ["timeline"] #["timeline_create"]
     try:
         return {
@@ -147,6 +160,11 @@ async def create_timeline():
         }
 
 def get_query_analyze(timeline: str) -> str:
+    """
+    Prompt engineering to get a prompt from a timeline
+    current: lang=fr, un peu trop scolaire?
+    TODO: test w/ users, evaluate how pertinent is the massage
+    """
     return f"""
 Prompt sur lévaluation 
 
@@ -222,17 +240,35 @@ La timeline:
 {timeline}
 """
 
-@app_router.get("/timeline/analyze/")
-async def analyze_timeline(timeline: str):
-    "http://localhost:8090/api/app/timeline/analyze/?timeline=PLACEHOLDER"
-    collections = ["timeline"] #["timeline_analyze"]
+@app_router.post("/timeline/analyze/")
+async def analyze_timeline(request: Request):
+    """ POST route to analyze timeline, returns an analyzed timeline
+    is used after a user finished a scenario
+    current: body is plain text, RAG collection is a constant
+    example url: http://localhost:8090/api/app/timeline/analyze/
+    example body: "Things happened."
+    TODO: body is json, and includes timeline + info on selected RAG knowledge base
+    TODO: use cached embedding/answers
+    TODO: stream answer to lower user waiting time
+    """
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+    timeline = body.decode("utf-8") #untested
+    collections = ["timeline"] #TODO: get collections from body
     try:
+        data = get_mistral_answer(
+            query=get_query_analyze(timeline), collection_name=str(collections)
+        )
+        if data is None:
+            return {
+                "status:": 500,
+                "message": "LLM API error",
+            }
         return {
-            "status:": 200,
+            "status:": 201,
             "message": "OK",
-            "data": get_mistral_answer(
-                query=get_mistral_answer(get_query_analyze(timeline)), collection_name=str(collections)
-            )
+            "data": data
         }
     except Exception as e:
         return {
