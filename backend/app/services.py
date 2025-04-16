@@ -170,30 +170,35 @@ def get_mistral_answer(
     llm_model_name: str = "mistral-small-latest",  # Or other suitable model
     history: list = None  # Expecting a list of chat messages, will be JSON serialized
 ):
-	retrieval_system_prompt = ""
+    """
+    get answer, enhanced w/ RAG
+    curr: RAG unused
+    TODO: use RAG
+    """
+    retrieval_system_prompt = ""
 
-	# Format collection name as a JSON array string
-	collection_list = json.dumps([collection_name])
+    # Format collection name as a JSON array string
+    collection_list = json.dumps([collection_name])
 
 
-	# Use Mistral model
-	retrieval_params = {
-		"query": query,
-		"model_family": "mistral",
-		"model_name": "mistral-small-latest",
-		"api_key": API_KEY,
-		"prompt": retrieval_system_prompt,
-		"collection_name": collection_list,
-		"history_data": json.dumps([])
-	}
+    # Use Mistral model
+    retrieval_params = {
+        "query": query,
+        "model_family": "mistral",
+        "model_name": "mistral-small-latest",
+        "api_key": API_KEY,
+        "prompt": retrieval_system_prompt,
+        "collection_name": collection_list,
+        "history_data": json.dumps([])
+    }
 
-	endpoint = '/api/app/back_app/'
-	url = f"{CHATBOT_API_BASE_URL}{endpoint}"
-	retrieval_response = requests.get(url, params=retrieval_params)
+    endpoint = '/api/app/back_app/'
+    url = f"{CHATBOT_API_BASE_URL}{endpoint}"
+    retrieval_response = requests.get(url, params=retrieval_params)
 
-	print(retrieval_response)
+    print(retrieval_response)
 
-	if retrieval_response.status_code != 200:
-		print(retrieval_response)
-		return None
-	return retrieval_response.text
+    if retrieval_response.status_code != 200:
+        print(retrieval_response)
+        return None
+    return retrieval_response.text
