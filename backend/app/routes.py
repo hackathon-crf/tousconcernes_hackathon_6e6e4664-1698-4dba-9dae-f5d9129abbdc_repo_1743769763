@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services import test_service, get_rag_answer, get_mistral_answer
 from settings.config import settings
@@ -222,13 +222,17 @@ La timeline:
 {timeline}
 """
 
-@app_router.get("/timeline/analyze/")
-async def analyze_timeline(timeline: str):
-    "http://localhost:8090/api/app/timeline/analyze/?timeline=PLACEHOLDER"
+@app_router.post("/timeline/analyze/")
+async def analyze_timeline(request: Request):
+    "http://localhost:8090/api/app/timeline/analyze/"
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+    timeline = body.decode("utf-8") #untested
     collections = ["timeline"] #["timeline_analyze"]
     try:
         return {
-            "status:": 200,
+            "status:": 201,
             "message": "OK",
             "data": get_mistral_answer(
                 query=get_mistral_answer(get_query_analyze(timeline)), collection_name=str(collections)
