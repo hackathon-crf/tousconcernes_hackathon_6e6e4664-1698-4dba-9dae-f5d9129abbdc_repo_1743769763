@@ -141,6 +141,7 @@ async def create_timeline():
     example url: http://localhost:8090/api/app/timeline/create/
     TODO: body is json, includes info on selected RAG knowledge base + info for prompt engineering
     TODO: use cached embedding/answers
+    TODO: make an interface between LLM/endpoint to always give a valid JSON format 
     TODO: stream answer to lower user waiting time
     """
     
