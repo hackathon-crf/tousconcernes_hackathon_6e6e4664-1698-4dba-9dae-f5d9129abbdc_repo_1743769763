@@ -1,3 +1,4 @@
 [submodule "reactvite"]
-	path = reactvite
-	url = git@github.com:Tablerase/HackathonCroixRouge.git
+path = reactvite
+url = git@github.com:Tablerase/HackathonCroixRouge.git
+branch = main

@@ -41,8 +41,10 @@ def create_app(root_path: str = "") -> FastAPI:
 async def test():
     return {
         "status:": 200,
-        "message": "coucou", #query_llm_with_knowledge("comment survivre a une inondation?", "timeline"),
+        # query_llm_with_knowledge("comment survivre a une inondation?", "timeline"),
+        "message": "coucou",
     }
+
 
 def get_query_create() -> str:
     """
@@ -108,7 +110,8 @@ Contraintes :
 - Tu dois inclure une action en lien avec les éléments à prendre sur soi en cas d'innondation kit de survie)
 - suivant l'action choisie, les choix effectués doivent impacter la situation suivante
 """
-    #return "Creer une timeline."
+    # return "Creer une timeline."
+
 
 @app_router.post("/timeline/create/")
 async def create_timeline():
@@ -121,8 +124,8 @@ async def create_timeline():
     TODO: make an interface between LLM/endpoint to always give a valid JSON format 
     TODO: stream answer to lower user waiting time
     """
-    
-    collections = ["timeline"] #["timeline_create"]
+
+    collections = ["timeline"]  # ["timeline_create"]
     try:
         return {
             "status:": 201,
@@ -136,6 +139,7 @@ async def create_timeline():
             "status:": 500,
             "message": f"{str(e)}",
         }
+
 
 def get_query_analyze(timeline: str) -> str:
     """
@@ -218,6 +222,7 @@ La timeline:
 {timeline}
 """
 
+
 @app_router.post("/timeline/analyze/")
 async def analyze_timeline(request: Request):
     """ POST route to analyze timeline, returns an analyzed timeline
@@ -232,12 +237,12 @@ async def analyze_timeline(request: Request):
     body = bytearray()
     async for chunk in request.stream():
         body.extend(chunk)
-    timeline = body.decode("utf-8") #untested
-    collections = "timeline" #TODO: get collections from body
+    timeline = body.decode("utf-8")  # untested
+    collections = "timeline"  # TODO: get collections from body
     try:
-		q_llm = get_query_analyze(timeline)
-		q_rag = timeline
-		data = query_llm_with_knowledge(q_llm, q_rag, collections)
+        q_llm = get_query_analyze(timeline)
+        q_rag = timeline
+        data = query_llm_with_knowledge(q_llm, q_rag, collections)
         if data is None:
             return {
                 "status:": 500,
