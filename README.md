@@ -1,3 +1,32 @@
+# Debug Back
+
+start back
+`uvicorn main_back:app --reload --host 0.0.0.0 --port <BACKEND_PORT>`
+
+start streamlit front
+`streamlit run main_front.py`
+
+env file
+
+```
+BACKEND_PORT = #port back
+ROOT_PATH =
+RAG_API_BASE_URL = #RAG
+CHATBOT_API_BASE_URL = #unused
+MISTRAL_API_KEY = #needed for LLM / RAG
+```
+
+endpoints
+
+```
+POST /timeline/create/ #unused
+POST /timeline/analyze/ #body: timeline as string, returns {
+            "status:": Number,
+            "message": string,
+            "data": string #if status is 2XX
+        }
+```
+
 # ForgeAI Default Application
 
 Welcome to the ForgeAI Default Application. This serves as an example to help you understand the structure and guidelines for automating and managing applications built on ForgeAI.
