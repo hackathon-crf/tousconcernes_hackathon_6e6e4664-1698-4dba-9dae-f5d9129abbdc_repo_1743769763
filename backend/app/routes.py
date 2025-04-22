@@ -276,7 +276,7 @@ async def analyze_timeline(request: Request):
         body.extend(chunk)
     timeline = body.decode("utf-8") 
     timeline = clean_timeline(timeline)
-    collections = "timeline"  # TODO: get collections from body
+    collections = "changenow" #"timeline"  # TODO: get collections from body
     try:
         q_llm = get_query_analyze(timeline, 'en')
         q_rag = timeline
