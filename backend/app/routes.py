@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.services import query_llm_with_knowledge
+from backend.app.services import query_llm_with_knowledge, clean_timeline
 from settings.config import settings
 
 app_router = APIRouter(
@@ -82,21 +82,21 @@ Contraintes et Style :
 La timeline:
 """
 
-QUERY_ANALYZE_EN = """You are an assistant evaluating user choices made in a simulated flood crisis.
+QUERY_ANALYZE_EN = """You are an assistant evaluating my choices made in a simulated flood crisis.
 Your tasks:
 
 1-Analyze each decision in the scenario.
 2-Judge if the choice was appropriate or not, based on best practices for flood safety.
 3-Provide a brief explanation for each judgment.
 4-Summarize overall performance.
-5-Give clear, constructive feedback to help the user improve their crisis response.
+5-Give clear, constructive feedback to help me improve their crisis response.
 6-Use a simple, neutral, educational tone.
 
-Input format (user timeline):
+Input format (my timeline):
 Timeline = {
 1: {
-    description: "factual description of the given event",
-    action: "user choice or action"
+    event: "factual description of the given event",
+    action: "my choice or action"
 },
 2: {
 ...
@@ -106,14 +106,14 @@ Output format:
 
 ## Evaluation ##
 
-**1:** "[User's action]": [Short explanation]  
-**2:** "[User's action]": [Short explanation]  
+**1:** "[My action]": [Short explanation]  
+**2:** "[My action]": [Short explanation]  
 ...
 
 **Summary:**  
-[Overall comments on performance and how the user can improve.]
+[Overall comments on performance and how I can improve.]
 
-User timeline:
+My timeline:
 """
 
 
@@ -274,7 +274,8 @@ async def analyze_timeline(request: Request):
     body = bytearray()
     async for chunk in request.stream():
         body.extend(chunk)
-    timeline = body.decode("utf-8")  # untested
+    timeline = body.decode("utf-8") 
+    timeline = clean_timeline(timeline)
     collections = "timeline"  # TODO: get collections from body
     try:
         q_llm = get_query_analyze(timeline, 'en')
