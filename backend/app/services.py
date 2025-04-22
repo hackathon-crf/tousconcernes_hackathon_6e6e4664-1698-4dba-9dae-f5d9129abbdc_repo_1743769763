@@ -9,9 +9,9 @@ import traceback
 
 load_dotenv()  # Load environment variables if using a .env file
 
-RAG_API_BASE_URL = os.getenv("RAG_API_BASE_URL", "http://127.0.0.1")
+RAG_API_BASE_URL = os.getenv("RAG_API_BASE_URL", "")
 CHATBOT_API_BASE_URL = os.getenv("CHATBOT_API_BASE_URL", "http://127.0.0.1")
-API_KEY = os.getenv("MISTRAL_API_KEY", "--NO KEY--")
+API_KEY = os.getenv("MISTRAL_API_KEY", "")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -203,6 +203,10 @@ def query_llm_with_embeddings(query,
 
 def query_llm_with_knowledge(query_llm: str, query_rag: str, collection_name: str) -> str | None:
     "return augmented answer from query + collection_name"
+    if "" == API_KEY:
+        raise Exception("Missing API key, check .env for MISTRAL_API_KEY")
+    if "" == RAG_API_BASE_URL:
+        raise Exception("RAG unavailable, check .env for RAG_API_BASE_URL") 
     embeddings = get_embeddings(query_rag, collection_name) #TODO: check correct parameters
     if embeddings is None:
         return None
