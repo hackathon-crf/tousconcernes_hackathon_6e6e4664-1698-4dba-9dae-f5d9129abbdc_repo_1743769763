@@ -16,6 +16,16 @@ CHATBOT_API_BASE_URL = #unused
 MISTRAL_API_KEY = #needed for LLM / RAG
 ```
 
+endpoints
+
+```
+POST /timeline/create/ #unused
+POST /timeline/analyze/ #body: timeline as string, returns {
+            "status:": Number,
+            "message": string,
+            "data": string #if status is 2XX
+        }
+```
 
 # ForgeAI Default Application
 
