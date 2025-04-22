@@ -9,12 +9,24 @@ import traceback
 
 load_dotenv()  # Load environment variables if using a .env file
 
-RAG_API_BASE_URL = os.getenv("RAG_API_BASE_URL", "http://127.0.0.1")
+RAG_API_BASE_URL = os.getenv("RAG_API_BASE_URL", "")
 CHATBOT_API_BASE_URL = os.getenv("CHATBOT_API_BASE_URL", "http://127.0.0.1")
-API_KEY = os.getenv("MISTRAL_API_KEY", "--NO KEY--")
+API_KEY = os.getenv("MISTRAL_API_KEY", "")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+
+def clean_timeline(timeline: str):
+    try:
+        timeline_json = json.loads(timeline)
+        d = timeline_json['timeline']
+        l = []
+        for key, value in d.items():
+            l.append({'event': value['event'], 'action': value['chosen_action']['text']})
+        timeline_clean = json.dumps(l)
+        return timeline_clean
+    except Exception:
+        return timeline
 
 def log_step(step_number, step_name):
     """Print a formatted step header"""
@@ -191,7 +203,8 @@ def query_llm_with_embeddings(query,
         llm_text = mistral_result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
         logger.info("\nMistral Response:")
-        logger.info(llm_text[:500] + "..." if len(llm_text) > 500 else llm_text)
+        logger.info(llm_text)
+        #logger.info(llm_text[:500] + "..." if len(llm_text) > 500 else llm_text)
 
         return llm_text
 
@@ -203,6 +216,10 @@ def query_llm_with_embeddings(query,
 
 def query_llm_with_knowledge(query_llm: str, query_rag: str, collection_name: str) -> str | None:
     "return augmented answer from query + collection_name"
+    if "" == API_KEY:
+        raise Exception("Missing API key, check .env for MISTRAL_API_KEY")
+    if "" == RAG_API_BASE_URL:
+        raise Exception("RAG unavailable, check .env for RAG_API_BASE_URL") 
     embeddings = get_embeddings(query_rag, collection_name) #TODO: check correct parameters
     if embeddings is None:
         return None
