@@ -104,13 +104,13 @@ Timeline = {
 
 Output format:
 
-## Evaluation ##
+# Evaluation
 
-**1:** "[My action]": [Short explanation]  
-**2:** "[My action]": [Short explanation]  
+**(1)[event]** "[My action]" [Short explanation] 
+**(2)[event]** "[My action]" [Short explanation]  
 ...
 
-**Summary:**  
+# Summary  
 [Overall comments on performance and how I can improve.]
 
 My timeline:

@@ -16,7 +16,8 @@ API_KEY = os.getenv("MISTRAL_API_KEY", "")
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-def clean_timeline(timeline: str):
+
+def clean_timeline(timeline: str) -> str:
     try:
         timeline_json = json.loads(timeline)
         d = timeline_json['timeline']
@@ -223,4 +224,7 @@ def query_llm_with_knowledge(query_llm: str, query_rag: str, collection_name: st
     embeddings = get_embeddings(query_rag, collection_name) #TODO: check correct parameters
     if embeddings is None:
         return None
-    return query_llm_with_embeddings(query_llm, embeddings) #TODO: check correct parameters
+    llm_output = query_llm_with_embeddings(query_llm, embeddings) #TODO: check correct parameters
+    if llm_output is None:
+        return None
+    return llm_output #TODO: clean_output
